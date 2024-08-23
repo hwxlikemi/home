@@ -23,7 +23,7 @@
         <!-- 站点备案 -->
         <span>
           &amp;
-          <a v-if="siteIcp" href="https://hwxlikemi-home.pages.dev" target="_blank">
+          <a v-if="siteIcp" href="https://github.com/hwxlikemi/home" target="_blank">
             {{ siteIcp }}
           </a>
         </span>
