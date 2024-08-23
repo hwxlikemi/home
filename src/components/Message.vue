@@ -152,7 +152,7 @@ watch(
 
         p {
           &:nth-of-type(1) {
-            font-family: "Pacifico-Regular-all";
+            font-family: "Pacifico-Regular";
           }
         }
       }
