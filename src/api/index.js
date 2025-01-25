@@ -62,7 +62,7 @@ export const getAdcode = async (key) => {
 // 获取高德地理天气信息
 export const getWeather = async (key, city) => {
   const res = await fetch(
-    `https://restapi.amap.com/v3/weather/weatherInfo?key=cbea1902cff38bf4d765c9931017a230&city=440783`,
+    `https://restapi.amap.com/v3/weather/weatherInfo?key=cbea1902cff38bf4d765c9931017a230&city=${city}`,
   );
   return await res.json();
 };
