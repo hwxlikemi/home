@@ -84,7 +84,7 @@ onMounted(() => {
   document.oncontextmenu = () => {
     ElMessage({
       message: "为了浏览体验，本站禁用右键",
-      grouping: true,
+      grouping: false,
       duration: 2000,
     });
     return false;
@@ -110,7 +110,15 @@ onMounted(() => {
   const styleTitle2 = "font-size:12px;color: rgb(244,167,89);";
   const styleContent = "color: rgb(30,152,255);";
   const title1 = "hwxlikemiの主页";
-  const title2 = `home.hwxlikemi.ip-ddns.com`;
+  const title2 = `
+ __ __  __    __  __ __  _      ____  __  _    ___  ___ ___  ____ 
+|  |  ||  |__|  ||  |  || |    |    ||  |/ ]  /  _]|   |   ||    |
+|  |  ||  |  |  ||  |  || |     |  | |  ' /  /  [_ | _   _ | |  | 
+|  _  ||  |  |  ||_   _|| |___  |  | |    \ |    _]|  \_/  | |  | 
+|  |  ||  `  '  ||     ||     | |  | |     \|   [_ |   |   | |  | 
+|  |  | \      / |  |  ||     | |  | |  .  ||     ||   |   | |  | 
+|__|__|  \_/\_/  |__|__||_____||____||__|\_||_____||___|___||____|
+                                                                  `;
   const content = `\n\n版本: ${config.version}\n主页: ${config.home}\nGithub: ${config.github}`;
   console.info(`%c${title1} %c${title2} %c${content}`, styleTitle1, styleTitle2, styleContent);
 });
