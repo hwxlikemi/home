@@ -111,10 +111,11 @@ onMounted(() => {
   const styleContent = "color: rgb(30,152,255);";
   const title1 = "hwxlikemiの主页";
   const title2 = "
-   __                __ _  __                _ 
-  / /  _    ____ __ / /(_)/ /__ ___  __ _   (_)
- / _ \| |/|/ /\ \ // // //  •_// -_)/  • \ / / 
-/_//_/|__•__//_\_\/_//_//_/\_\ \__//_/_/_//_/ ";
+h           l  k              
+h           liik k         ii 
+hhh w   wx xl  kk  eeemmmm    
+h  hw w w x liik k e em m mii 
+h  h w w x xliik  kee m m mii";
   const content = `\n\n版本: ${config.version}\n主页: ${config.home}\nGithub: ${config.github}`;
   console.info(`%c${title1} %c${title2} %c${content}`, styleTitle1, styleTitle2, styleContent);
 });
