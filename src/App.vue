@@ -116,9 +116,7 @@ onMounted(() => {
  | |__   __      __ __  __ | |  _  | | __   ___   _ __ ___    _ 
  | '_ \  \ \ /\ / / \ \/ / | | | | | |/ /  / _ \ | '_ ` _ \  | |
  | | | |  \ V  V /   >  <  | | | | |   <  |  __/ | | | | | | | |
- |_| |_|   \_/\_/   /_/\_\ |_| |_| |_|\_\  \___| |_| |_| |_| |_|
-                                                                
-                                                                `;
+ |_| |_|   \_/\_/   /_/\_\ |_| |_| |_|\_\  \___| |_| |_| |_| |_|`;
   const content = `\n\n版本: ${config.version}\n主页: ${config.home}\nGithub: ${config.github}`;
   console.info(`%c${title1} %c${title2} %c${content}`, styleTitle1, styleTitle2, styleContent);
 });
