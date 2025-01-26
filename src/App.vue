@@ -110,13 +110,7 @@ onMounted(() => {
   const styleTitle2 = "font-size:12px;color: rgb(244,167,89);";
   const styleContent = "color: rgb(30,152,255);";
   const title1 = "hwxlikemiの主页";
-  const title2 = `
-  _                         _   _   _                         _ 
- | |                       | | (_) | |                       (_)
- | |__   __      __ __  __ | |  _  | | __   ___   _ __ ___    _ 
- | '_ \  \ \ /\ / / \ \/ / | | | | | |/ /  / _ \ | '_ ` _ \  | |
- | | | |  \ V  V /   >  <  | | | | |   <  |  __/ | | | | | | | |
- |_| |_|   \_/\_/   /_/\_\ |_| |_| |_|\_\  \___| |_| |_| |_| |_|`;
+  const title2 = `home.hwxlikemi.ip-ddns.com`;
   const content = `\n\n版本: ${config.version}\n主页: ${config.home}\nGithub: ${config.github}`;
   console.info(`%c${title1} %c${title2} %c${content}`, styleTitle1, styleTitle2, styleContent);
 });
