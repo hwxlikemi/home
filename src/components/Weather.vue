@@ -1,5 +1,6 @@
 <template>
-  <div class="weather" v-if="weatherData.adCode.city && weatherData.weather.weather"
+  <div class="weather" v-if="weatherData.adCode.city && weatherData.weather.weather">
+    <span>{{ weatherData.adCode.city }}&nbsp;</span>
     <span>{{ weatherData.weather.weather }}&nbsp;</span>
     <span>{{ weatherData.weather.temperature }}℃</span>
     <span class="sm-hidden">
@@ -19,10 +20,8 @@
 <script setup>
 import { getAdcode, getWeather, getOtherWeather } from "@/api";
 import { Error } from "@icon-park/vue-next";
-
 // 高德开发者 Key
 const mainKey = import.meta.env.VITE_WEATHER_KEY;
-
 // 天气数据
 const weatherData = reactive({
   adCode: {
@@ -36,7 +35,6 @@ const weatherData = reactive({
     windpower: null, // 风力级别
   },
 });
-
 // 取出天气平均值
 const getTemperature = (min, max) => {
   try {
@@ -48,7 +46,6 @@ const getTemperature = (min, max) => {
     return "NaN";
   }
 };
-
 // 获取天气数据
 const getWeatherData = async () => {
   try {
@@ -93,7 +90,6 @@ const getWeatherData = async () => {
     onError("天气信息获取失败");
   }
 };
-
 // 报错信息
 const onError = (message) => {
   ElMessage({
@@ -105,7 +101,6 @@ const onError = (message) => {
   });
   console.error(message);
 };
-
 onMounted(() => {
   // 调用获取天气
   getWeatherData();
