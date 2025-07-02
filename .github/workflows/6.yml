@@ -1,24 +1,26 @@
-name: Build and Deploy Dev to Vercel
+name: Build Dev
 
 on:
   push:
     branches:
       - dev
+      - master
 
 jobs:
-  build-deploy:
+  release:
+    name: Build Website and Deploy to vercelhome
     runs-on: windows-latest
 
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v4.1.1
+      - name: Check out source repo
+        uses: actions/checkout@v4
 
       - name: Setup Node.js
-        uses: actions/setup-node@v4.0.0
+        uses: actions/setup-node@v4
         with:
-          node-version: '18.x'
+          node-version: "18.x"
 
-      - name: Copy .env.example if not exists
+      - name: Copy .env.example if .env not exists
         run: |
           if (-not (Test-Path .env)) {
             Copy-Item .env.example .env
@@ -27,15 +29,30 @@ jobs:
       - name: Install dependencies
         run: npm install
 
-      - name: Build project
+      - name: Build website
         run: npm run build
 
-      - name: Deploy to Vercel
-        uses: amondnet/vercel-action@v25
-        with:
-          vercel-token: ${{ secrets.VERCEL_TOKEN }}
-          vercel-org-id: ${{ secrets.VERCEL_ORG_ID }}
-          vercel-project-id: ${{ secrets.VERCEL_PROJECT_ID }}
-          working-directory: ./
+      # 这里不用上传 artifact，因为我们直接操作代码推送目标仓库
+
+      - name: Clone target repo (vercelhome)
         env:
-          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+          DEPLOY_REPO: https://github.com/hwxlikemi/vercelhome.git
+          DEPLOY_TOKEN: ${{ secrets.DEPLOY_TOKEN }}  # 这个是有写权限的token
+        run: |
+          git clone https://x-access-token:${DEPLOY_TOKEN}@github.com/hwxlikemi/vercelhome.git deploy_repo
+
+      - name: Copy build output to deploy repo
+        run: |
+          Remove-Item -Recurse -Force deploy_repo\*    # 删除原有文件
+          Copy-Item -Recurse dist\* deploy_repo\       # 拷贝构建文件
+
+      - name: Commit and push changes to vercelhome
+        working-directory: deploy_repo
+        env:
+          DEPLOY_TOKEN: ${{ secrets.DEPLOY_TOKEN }}
+        run: |
+          git config user.name "github-actions"
+          git config user.email "github-actions@github.com"
+          git add -A
+          git commit -m "Deploy updated website from $GITHUB_SHA" || echo "No changes to commit"
+          git push origin main
