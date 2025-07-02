@@ -8,61 +8,47 @@ on:
 
 jobs:
   build_and_deploy:
-    runs-on: windows-latest
+    runs-on: ubuntu-latest  # ✅ 换成 Ubuntu 避免认证问题
 
     steps:
-      # 1. Checkout source repo
       - name: Checkout source repository
         uses: actions/checkout@v4
 
-      # 2. Setup Node.js
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: "18.x"
 
-      # 3. Copy .env.example if .env not exists
       - name: Copy .env.example if no .env exists
         run: |
-          if (-not (Test-Path .env)) {
-            Copy-Item .env.example .env
-          } else {
-            Write-Host ".env exists, skipping copy"
-          }
+          if [ ! -f .env ]; then
+            cp .env.example .env
+          fi
 
-      # 4. Install dependencies
       - name: Install dependencies
         run: npm install
 
-      # 5. Build project
       - name: Build project
         run: npm run build
 
-      # 6. Clone private deploy repository with token auth
-      - name: Clone private deploy repository
+      - name: Clone private deploy repo
         env:
           DEPLOY_TOKEN: ${{ secrets.DEPLOY_TOKEN }}
         run: |
           git clone https://${DEPLOY_TOKEN}@github.com/hwxlikemi/vercelhome.git deploy_repo
 
-      # 7. Clean old files in deploy_repo
-      - name: Clean deploy repository files
+      - name: Clear old files
         run: |
-          Remove-Item -Recurse -Force deploy_repo\* 
+          rm -rf deploy_repo/*
+          cp -r dist/* deploy_repo/
 
-      # 8. Copy new build files to deploy_repo
-      - name: Copy build output to deploy repo
-        run: |
-          Copy-Item -Recurse dist\* deploy_repo\
-
-      # 9. Commit and push changes to private repo
-      - name: Commit and push changes
+      - name: Commit and push
         working-directory: deploy_repo
         env:
           DEPLOY_TOKEN: ${{ secrets.DEPLOY_TOKEN }}
         run: |
           git config user.name "github-actions"
           git config user.email "github-actions@github.com"
-          git add -A
-          git commit -m "Deploy updated website from $GITHUB_SHA" || echo "No changes to commit"
+          git add .
+          git commit -m "Deploy from $GITHUB_REPOSITORY@$GITHUB_SHA" || echo "Nothing to commit"
           git push origin main
