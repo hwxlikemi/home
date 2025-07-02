@@ -1,4 +1,4 @@
-name: Build Dev
+name: Build and Deploy to vercelhome
 
 on:
   push:
@@ -7,46 +7,56 @@ on:
       - master
 
 jobs:
-  release:
-    name: Build Website and Deploy to vercelhome
+  build_and_deploy:
     runs-on: windows-latest
 
     steps:
-      - name: Check out source repo
+      # 1. 拉取当前仓库代码
+      - name: Checkout source repository
         uses: actions/checkout@v4
 
+      # 2. 安装 Node.js
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: "18.x"
 
-      - name: Copy .env.example if .env not exists
+      # 3. 复制 .env 文件（如果没有）
+      - name: Copy .env.example if no .env exists
         run: |
           if (-not (Test-Path .env)) {
             Copy-Item .env.example .env
+          } else {
+            Write-Host ".env exists, skipping copy"
           }
 
+      # 4. 安装依赖
       - name: Install dependencies
         run: npm install
 
-      - name: Build website
+      # 5. 构建项目
+      - name: Build project
         run: npm run build
 
-      # 这里不用上传 artifact，因为我们直接操作代码推送目标仓库
-
-      - name: Clone target repo (vercelhome)
+      # 6. Clone 目标仓库（vercelhome）
+      - name: Clone deploy repository
         env:
-          DEPLOY_REPO: https://github.com/hwxlikemi/vercelhome.git
-          DEPLOY_TOKEN: ${{ secrets.DEPLOY_TOKEN }}  # 这个是有写权限的token
+          DEPLOY_TOKEN: ${{ secrets.DEPLOY_TOKEN }}
         run: |
-          git clone https://x-access-token:${DEPLOY_TOKEN}@github.com/hwxlikemi/vercelhome.git deploy_repo
+          git clone https://${DEPLOY_TOKEN}@github.com/hwxlikemi/vercelhome.git deploy_repo
 
+      # 7. 清空目标仓库旧内容
+      - name: Clean deploy repository files
+        run: |
+          Remove-Item -Recurse -Force deploy_repo\* 
+
+      # 8. 复制构建产物到目标仓库
       - name: Copy build output to deploy repo
         run: |
-          Remove-Item -Recurse -Force deploy_repo\*    # 删除原有文件
-          Copy-Item -Recurse dist\* deploy_repo\       # 拷贝构建文件
+          Copy-Item -Recurse dist\* deploy_repo\
 
-      - name: Commit and push changes to vercelhome
+      # 9. 提交并推送到目标仓库
+      - name: Commit and push changes
         working-directory: deploy_repo
         env:
           DEPLOY_TOKEN: ${{ secrets.DEPLOY_TOKEN }}
