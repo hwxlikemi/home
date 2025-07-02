@@ -1,4 +1,4 @@
-name: Build and Deploy to vercelhome
+name: Build and Deploy to vercelhome (Private Repo)
 
 on:
   push:
@@ -11,17 +11,17 @@ jobs:
     runs-on: windows-latest
 
     steps:
-      # 1. 拉取当前仓库代码
+      # 1. Checkout source repo
       - name: Checkout source repository
         uses: actions/checkout@v4
 
-      # 2. 安装 Node.js
+      # 2. Setup Node.js
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: "18.x"
 
-      # 3. 复制 .env 文件（如果没有）
+      # 3. Copy .env.example if .env not exists
       - name: Copy .env.example if no .env exists
         run: |
           if (-not (Test-Path .env)) {
@@ -30,32 +30,32 @@ jobs:
             Write-Host ".env exists, skipping copy"
           }
 
-      # 4. 安装依赖
+      # 4. Install dependencies
       - name: Install dependencies
         run: npm install
 
-      # 5. 构建项目
+      # 5. Build project
       - name: Build project
         run: npm run build
 
-      # 6. Clone 目标仓库（vercelhome）
-      - name: Clone deploy repository
+      # 6. Clone private deploy repository with token auth
+      - name: Clone private deploy repository
         env:
           DEPLOY_TOKEN: ${{ secrets.DEPLOY_TOKEN }}
         run: |
           git clone https://${DEPLOY_TOKEN}@github.com/hwxlikemi/vercelhome.git deploy_repo
 
-      # 7. 清空目标仓库旧内容
+      # 7. Clean old files in deploy_repo
       - name: Clean deploy repository files
         run: |
           Remove-Item -Recurse -Force deploy_repo\* 
 
-      # 8. 复制构建产物到目标仓库
+      # 8. Copy new build files to deploy_repo
       - name: Copy build output to deploy repo
         run: |
           Copy-Item -Recurse dist\* deploy_repo\
 
-      # 9. 提交并推送到目标仓库
+      # 9. Commit and push changes to private repo
       - name: Commit and push changes
         working-directory: deploy_repo
         env:
