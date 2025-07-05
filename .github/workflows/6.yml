@@ -7,22 +7,23 @@ on:
 
 jobs:
   build-deploy:
-    runs-on: windows-latest
+    runs-on: ubuntu-latest
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4.1.1
+        uses: actions/checkout@v4
 
       - name: Setup Node.js
-        uses: actions/setup-node@v4.0.0
+        uses: actions/setup-node@v4
         with:
-          node-version: '18.x'
+          node-version: '18'
+          cache: 'npm'
 
       - name: Copy .env.example if not exists
         run: |
-          if (-not (Test-Path .env)) {
-            Copy-Item .env.example .env
-          }
+          if [ ! -f .env ]; then
+            cp .env.example .env
+          fi
 
       - name: Install dependencies
         run: npm install
@@ -30,12 +31,8 @@ jobs:
       - name: Build project
         run: npm run build
 
-      - name: Deploy to Vercel
-        uses: amondnet/vercel-action@v25
-        with:
-          vercel-token: ${{ secrets.VERCEL_TOKEN }}
-          vercel-org-id: ${{ secrets.VERCEL_ORG_ID }}
-          vercel-project-id: ${{ secrets.VERCEL_PROJECT_ID }}
-          working-directory: ./
-        env:
-          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+      - name: Install Vercel CLI
+        run: npm install -g vercel
+
+      - name: Deploy to Vercel (Production)
+        run: vercel --prod --confirm --token ${{ secrets.VERCEL_TOKEN }} --org ${{ secrets.VERCEL_ORG_ID }} --project ${{ secrets.VERCEL_PROJECT_ID }}
