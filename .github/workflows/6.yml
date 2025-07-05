@@ -1,29 +1,28 @@
-name: Build and Deploy to vercelhome (Private Repo)
+name: Build and Deploy Dev to Vercel
 
 on:
   push:
     branches:
       - dev
-      - master
 
 jobs:
-  build_and_deploy:
-    runs-on: ubuntu-latest  # ✅ 换成 Ubuntu 避免认证问题
+  build-deploy:
+    runs-on: windows-latest
 
     steps:
-      - name: Checkout source repository
-        uses: actions/checkout@v4
+      - name: Checkout code
+        uses: actions/checkout@v4.1.1
 
       - name: Setup Node.js
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v4.0.0
         with:
-          node-version: "18.x"
+          node-version: '18.x'
 
-      - name: Copy .env.example if no .env exists
+      - name: Copy .env.example if not exists
         run: |
-          if [ ! -f .env ]; then
-            cp .env.example .env
-          fi
+          if (-not (Test-Path .env)) {
+            Copy-Item .env.example .env
+          }
 
       - name: Install dependencies
         run: npm install
@@ -31,24 +30,12 @@ jobs:
       - name: Build project
         run: npm run build
 
-      - name: Clone private deploy repo
+      - name: Deploy to Vercel
+        uses: amondnet/vercel-action@v25
+        with:
+          vercel-token: ${{ secrets.VERCEL_TOKEN }}
+          vercel-org-id: ${{ secrets.VERCEL_ORG_ID }}
+          vercel-project-id: ${{ secrets.VERCEL_PROJECT_ID }}
+          working-directory: ./
         env:
-          DEPLOY_TOKEN: ${{ secrets.DEPLOY_TOKEN }}
-        run: |
-          git clone https://${DEPLOY_TOKEN}@github.com/hwxlikemi/vercelhome.git deploy_repo
-
-      - name: Clear old files
-        run: |
-          rm -rf deploy_repo/*
-          cp -r dist/* deploy_repo/
-
-      - name: Commit and push
-        working-directory: deploy_repo
-        env:
-          DEPLOY_TOKEN: ${{ secrets.DEPLOY_TOKEN }}
-        run: |
-          git config user.name "github-actions"
-          git config user.email "github-actions@github.com"
-          git add .
-          git commit -m "Deploy from $GITHUB_REPOSITORY@$GITHUB_SHA" || echo "Nothing to commit"
-          git push origin main
+          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
